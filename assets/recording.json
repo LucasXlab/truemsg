@@ -1,0 +1,74 @@
+{
+  "showcase_script_sha256": "f18c513a2e56f8f140591241e8d8501ef1ba7be8e63aaf76112c4264860945c6",
+  "renderer_script_sha256": "9ad0d276858173460d1001cb184dbb764943a315812d95c660871a0a421cdceb",
+  "raw_results_sha256": "6e4c44d3416a5d308c3123915aeaf5e5066dc5570c02eca2d9218258bc16fbee",
+  "cast_sha256": "1ebc11950a99bda8c5974b15b0f7ac79f11bc228b95da5480f95594dcfc7772b",
+  "cast_events": 21,
+  "case_count": 6,
+  "source_version": "0.2.0",
+  "rendering": "Faithful render of showcase's labelled JSON projection and actual Git output; CRLF -> LF and visual wrapping only. Full unmodified CLI stdout/stderr in showcase-raw.json.",
+  "gif": {
+    "cases": [
+      "matching",
+      "mismatch",
+      "evidence"
+    ],
+    "frame_holds_ms": [
+      3200,
+      3800,
+      4200
+    ],
+    "timing": "readability holds, not recorded execution speed"
+  },
+  "social_preview": "Code-native schematic, not a running CLI screenshot",
+  "assets": {
+    "feature-git-boundary.png": {
+      "width": 1280,
+      "height": 440,
+      "frames": 1,
+      "sha256": "216cdad01f1379698f85cc74a0e4f7f68ac362246c578115f88b20ca3aabfa55"
+    },
+    "social-preview.png": {
+      "width": 1280,
+      "height": 640,
+      "frames": 1,
+      "sha256": "701446578e50e656679dda8f6c5baf32184f4d8de7c64abe5e76a96360bef1c6"
+    },
+    "feature-suggest.png": {
+      "width": 1280,
+      "height": 440,
+      "frames": 1,
+      "sha256": "42004fde397c94d54e54606bb88c8ec358b0cd77f244323367a54191c94019c8"
+    },
+    "feature-hooks.png": {
+      "width": 1280,
+      "height": 440,
+      "frames": 1,
+      "sha256": "c6d24cac0d3d72b75d75889225921eb9262e28ad554368bc78b15d415056983a"
+    },
+    "feature-mismatch.png": {
+      "width": 1280,
+      "height": 643,
+      "frames": 1,
+      "sha256": "046f60d3908c5cde88436aeb2d5b6bec2fecf46a64f6c04e66836d75663ce86b"
+    },
+    "feature-matching.png": {
+      "width": 1280,
+      "height": 670,
+      "frames": 1,
+      "sha256": "36db91e977dd9ef9ebeada93d3c0744291ae8c387a4d65e8af3690c1eaed4d26"
+    },
+    "feature-evidence.png": {
+      "width": 1280,
+      "height": 440,
+      "frames": 1,
+      "sha256": "e11d30335be512de8aa192b0a6a3b2e8e7f0323b0cb29bc2d51f131c2dcd6525"
+    },
+    "demo.gif": {
+      "width": 1280,
+      "height": 900,
+      "frames": 3,
+      "sha256": "e87f26a78abcf3796f6975af4f0e146b60387f8dad07dab88954a54de2128a2f"
+    }
+  }
+}

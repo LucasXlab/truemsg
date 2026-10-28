@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">truemsg</title><desc id="desc">A message card overlaps a diff card: inspect a claim against visible changes.</desc>
+  <rect width="96" height="96" rx="24" fill="#1a2236"/>
+  <rect x="17" y="17" width="46" height="40" rx="7" fill="none" stroke="#9bb8ff" stroke-width="4"/>
+  <path d="M28 30h22M28 42h15" stroke="#9bb8ff" stroke-width="3"/>
+  <rect x="39" y="41" width="40" height="38" rx="6" fill="#1a2236" stroke="#f2ca7a" stroke-width="4"/>
+  <path d="M48 54h11M66 62v12M60 68h12" stroke="#f2ca7a" stroke-width="3"/>
+</svg>

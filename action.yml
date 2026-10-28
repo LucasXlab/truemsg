@@ -1,0 +1,37 @@
+name: truemsg
+description: Offline heuristic checks of commit messages against Git changes
+branding:
+  icon: check-circle
+  color: green
+inputs:
+  range:
+    description: Optional A..B range; PRs use merge-base comparison by default.
+    required: false
+  working-directory:
+    description: Working tree to inspect; defaults to the workflow workspace.
+    required: false
+    default: .
+  fail-on:
+    description: Exit threshold, fail or warn.
+    required: false
+    default: fail
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    - name: Install the checked-out action source
+      run: python -m pip install "$GITHUB_ACTION_PATH"
+      shell: bash
+    - name: Check the selected changes
+      env:
+        TRUEMSG_WORKDIR: ${{ inputs.working-directory }}
+        TRUEMSG_RANGE: ${{ inputs.range }}
+        TRUEMSG_FAIL_ON: ${{ inputs.fail-on }}
+        TRUEMSG_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        TRUEMSG_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        TRUEMSG_PR_TITLE: ${{ github.event.pull_request.title }}
+        TRUEMSG_PR_BODY: ${{ github.event.pull_request.body }}
+      run: bash "$GITHUB_ACTION_PATH/scripts/action-check.sh"
+      shell: bash

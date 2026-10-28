@@ -1,0 +1,162 @@
+{
+  "schema": "truemsg-showcase-v1",
+  "synthetic_only": true,
+  "display": "Selected JSON fields are a labelled projection; stdout/stderr and diffs below are complete and unmodified.",
+  "cases": [
+    {
+      "name": "matching",
+      "title": "A lexical match still needs review",
+      "command": [
+        "truemsg",
+        "check",
+        "--json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"verdict\": \"PASS\",\n  \"score\": 100,\n  \"summary\": {\n    \"files\": 1,\n    \"added\": 2,\n    \"removed\": 0,\n    \"real_lines\": 2,\n    \"overlap\": 0.75\n  },\n  \"message\": {\n    \"type\": \"feat\",\n    \"subject\": \"add authenticate token handler\",\n    \"breaking\": false\n  },\n  \"findings\": [\n    {\n      \"level\": \"info\",\n      \"rule\": \"consistent\",\n      \"title\": \"\\u89c4\\u5219\\u672a\\u53d1\\u73b0\\u8bcd\\u6cd5\\u51b2\\u7a81\\uff08\\u9700\\u4eba\\u5de5\\u590d\\u6838\\uff09\",\n      \"detail\": \"\\u5173\\u952e\\u8bcd\\u91cd\\u5408 75%\\uff1b\\u4e0d\\u8bc1\\u660e\\u8bed\\u4e49\\u4e00\\u81f4\\u6216\\u6539\\u52a8\\u6b63\\u786e\\u3002\"\n    }\n  ],\n  \"evidence\": {\n    \"semantic_verified\": false,\n    \"language\": \"ASCII keywords\",\n    \"content_complete\": true,\n    \"keywords_available\": true\n  },\n  \"changes\": [\n    {\n      \"path\": \"src/auth.py\",\n      \"old_path\": \"src/auth.py\",\n      \"status\": \"added\",\n      \"binary\": false,\n      \"mode_changed\": false,\n      \"content_supported\": true,\n      \"added_count\": 2,\n      \"removed_count\": 0\n    }\n  ]\n}\n",
+      "stderr": "",
+      "synthetic_diff": "diff --git a/src/auth.py b/src/auth.py\nnew file mode 100644\nindex 0000000..41969e0\n--- /dev/null\n+++ b/src/auth.py\n@@ -0,0 +1,2 @@\n+def authenticate(token):\n+    return bool(token)\n",
+      "field_view": {
+        "verdict": "PASS",
+        "message": {
+          "type": "feat",
+          "subject": "add authenticate token handler",
+          "breaking": false
+        },
+        "rule_ids": [
+          "consistent"
+        ],
+        "summary": {
+          "files": 1,
+          "added": 2,
+          "removed": 0
+        },
+        "evidence": {
+          "semantic_verified": false,
+          "keywords_available": true
+        }
+      }
+    },
+    {
+      "name": "mismatch",
+      "title": "Feature wording, tests-only diff",
+      "command": [
+        "truemsg",
+        "check",
+        "--json"
+      ],
+      "exit_code": 1,
+      "stdout": "{\n  \"verdict\": \"FAIL\",\n  \"score\": 60,\n  \"summary\": {\n    \"files\": 1,\n    \"added\": 2,\n    \"removed\": 0,\n    \"real_lines\": 0,\n    \"overlap\": 0.5\n  },\n  \"message\": {\n    \"type\": \"feat\",\n    \"subject\": \"add payment gateway\",\n    \"breaking\": false\n  },\n  \"findings\": [\n    {\n      \"level\": \"fail\",\n      \"rule\": \"trivial-change\",\n      \"title\": \"\\u58f0\\u79f0\\u300cfeat\\u300d\\u6539\\u52a8\\uff0c\\u4f46\\u4ec5\\u6d89\\u53ca\\uff1a\\u6d4b\\u8bd5\",\n      \"detail\": \"\\u4ec5\\u53d1\\u73b0\\u6587\\u6863\\u3001\\u6d4b\\u8bd5\\u3001\\u751f\\u6210\\u8def\\u5f84\\u6216\\u6ce8\\u91ca\\u4fe1\\u53f7\\uff1b\\u8fd9\\u4e0d\\u662f\\u65e0\\u884c\\u4e3a\\u53d8\\u5316\\u7684\\u8bc1\\u660e\\uff0c\\u8bf7\\u4eba\\u5de5\\u590d\\u6838\\u3002\"\n    }\n  ],\n  \"evidence\": {\n    \"semantic_verified\": false,\n    \"language\": \"ASCII keywords\",\n    \"content_complete\": true,\n    \"keywords_available\": true\n  },\n  \"changes\": [\n    {\n      \"path\": \"tests/test_payments.py\",\n      \"old_path\": \"tests/test_payments.py\",\n      \"status\": \"added\",\n      \"binary\": false,\n      \"mode_changed\": false,\n      \"content_supported\": true,\n      \"added_count\": 2,\n      \"removed_count\": 0\n    }\n  ]\n}\n",
+      "stderr": "",
+      "synthetic_diff": "diff --git a/tests/test_payments.py b/tests/test_payments.py\nnew file mode 100644\nindex 0000000..88c6672\n--- /dev/null\n+++ b/tests/test_payments.py\n@@ -0,0 +1,2 @@\n+def test_payments():\n+    assert True\n",
+      "field_view": {
+        "verdict": "FAIL",
+        "message": {
+          "type": "feat",
+          "subject": "add payment gateway",
+          "breaking": false
+        },
+        "rule_ids": [
+          "trivial-change"
+        ],
+        "summary": {
+          "files": 1,
+          "added": 2,
+          "removed": 0
+        },
+        "evidence": {
+          "semantic_verified": false,
+          "keywords_available": true
+        }
+      }
+    },
+    {
+      "name": "evidence",
+      "title": "Chinese message: insufficient lexical evidence",
+      "command": [
+        "truemsg",
+        "check",
+        "--ref",
+        "HEAD~1",
+        "--title",
+        "fix: 修复支付漏洞",
+        "--json",
+        "--fail-on",
+        "warn"
+      ],
+      "exit_code": 1,
+      "stdout": "{\n  \"verdict\": \"WARN\",\n  \"score\": 85,\n  \"summary\": {\n    \"files\": 1,\n    \"added\": 2,\n    \"removed\": 0,\n    \"real_lines\": 2,\n    \"overlap\": 0.0\n  },\n  \"message\": {\n    \"type\": \"fix\",\n    \"subject\": \"\\u4fee\\u590d\\u652f\\u4ed8\\u6f0f\\u6d1e\",\n    \"breaking\": false\n  },\n  \"findings\": [\n    {\n      \"level\": \"warn\",\n      \"rule\": \"insufficient-keywords\",\n      \"title\": \"Insufficient lexical evidence\",\n      \"detail\": \"No supported ASCII keywords; non-English messages require manual review.\"\n    }\n  ],\n  \"evidence\": {\n    \"semantic_verified\": false,\n    \"language\": \"ASCII keywords\",\n    \"content_complete\": true,\n    \"keywords_available\": false\n  },\n  \"changes\": [\n    {\n      \"path\": \"src/auth.py\",\n      \"old_path\": \"src/auth.py\",\n      \"status\": \"added\",\n      \"binary\": false,\n      \"mode_changed\": false,\n      \"content_supported\": true,\n      \"added_count\": 2,\n      \"removed_count\": 0\n    }\n  ]\n}\n",
+      "stderr": "",
+      "synthetic_diff": null,
+      "field_view": {
+        "verdict": "WARN",
+        "message": {
+          "type": "fix",
+          "subject": "修复支付漏洞",
+          "breaking": false
+        },
+        "rule_ids": [
+          "insufficient-keywords"
+        ],
+        "summary": {
+          "files": 1,
+          "added": 2,
+          "removed": 0
+        },
+        "evidence": {
+          "semantic_verified": false,
+          "keywords_available": false
+        }
+      }
+    },
+    {
+      "name": "suggest",
+      "title": "A deterministic draft, not a verified explanation",
+      "command": [
+        "truemsg",
+        "suggest",
+        "--ref",
+        "HEAD~1",
+        "--json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"type\": \"feat\",\n  \"scope\": \"src\",\n  \"subject\": \"add authenticate\",\n  \"conventional\": \"feat(src): add authenticate\",\n  \"requires_review\": true,\n  \"basis\": \"changed paths and declarations; suggested type is provisional\"\n}\n",
+      "stderr": "",
+      "synthetic_diff": null,
+      "field_view": {
+        "type": "feat",
+        "scope": "src",
+        "subject": "add authenticate",
+        "conventional": "feat(src): add authenticate",
+        "requires_review": true,
+        "basis": "changed paths and declarations; suggested type is provisional"
+      }
+    },
+    {
+      "name": "hooks",
+      "title": "Existing hooks are preserved",
+      "command": [
+        "truemsg",
+        "hook",
+        "--install"
+      ],
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "[truemsg] Existing hook is not owned by truemsg; preserve it and integrate manually\n",
+      "synthetic_diff": null
+    },
+    {
+      "name": "git-boundary",
+      "title": "An option is not a commit ref",
+      "command": [
+        "truemsg",
+        "check",
+        "--ref=--output=unexpected.patch",
+        "--json"
+      ],
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "[truemsg] Invalid revision: expected a commit ref, not an option\n",
+      "synthetic_diff": null
+    }
+  ]
+}

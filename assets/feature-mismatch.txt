@@ -1,0 +1,17 @@
+$ git show --format= --no-ext-diff --no-textconv -U0 HEAD
+diff --git a/tests/test_payments.py b/tests/test_payments.py
+new file mode 100644
+index 0000000..88c6672
+--- /dev/null
++++ b/tests/test_payments.py
+@@ -0,0 +1,2 @@
++def test_payments():
++    assert True
+$ truemsg check --json
+[JSON field view; full stdout in showcase-raw.json]
+verdict: "FAIL"
+message: {"type": "feat", "subject": "add payment gateway", "breaking": false}
+rule_ids: ["trivial-change"]
+summary: {"files": 1, "added": 2, "removed": 0}
+evidence: {"semantic_verified": false, "keywords_available": true}
+[exit 1]

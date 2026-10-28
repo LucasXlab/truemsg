@@ -1,0 +1,4 @@
+$ truemsg hook --install
+[truemsg] Existing hook is not owned by truemsg; preserve it and integrate manually
+[exit 2]
+[showcase assertion] existing hook bytes unchanged: true

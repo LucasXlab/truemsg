@@ -1,0 +1,37 @@
+name: Local action smoke
+on:
+  push:
+    branches: [main, master, 'noah/**']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  synthetic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make a synthetic repository
+        env:
+          GIT_AUTHOR_NAME: Synthetic Contributor
+          GIT_AUTHOR_EMAIL: contributor@example.invalid
+          GIT_COMMITTER_NAME: Synthetic Contributor
+          GIT_COMMITTER_EMAIL: contributor@example.invalid
+          GIT_CONFIG_GLOBAL: /dev/null
+          GIT_CONFIG_NOSYSTEM: '1'
+        run: |
+          mkdir "$RUNNER_TEMP/action-fixture"
+          cd "$RUNNER_TEMP/action-fixture"
+          git init -b main
+          printf '# Synthetic fixture\n' > README.md
+          git add README.md
+          git commit -m 'docs: initial fixture'
+          mkdir src
+          printf 'def authenticate(token):\n    return True\n' > src/auth.py
+          git add src/auth.py
+          git commit -m 'feat(auth): add authenticate function'
+      - uses: ./
+        with:
+          working-directory: '${{ runner.temp }}/action-fixture'
+          range: HEAD~1..HEAD
+          fail-on: warn

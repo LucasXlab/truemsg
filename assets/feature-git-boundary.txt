@@ -1,0 +1,4 @@
+$ truemsg check --ref=--output=unexpected.patch --json
+[truemsg] Invalid revision: expected a commit ref, not an option
+[exit 2]
+[showcase assertion] unexpected.patch absent: true

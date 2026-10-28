@@ -1,0 +1,8 @@
+$ truemsg check --ref 'HEAD~1' --title 'fix: 修复支付漏洞' --json --fail-on warn
+[JSON field view; full stdout in showcase-raw.json]
+verdict: "WARN"
+message: {"type": "fix", "subject": "修复支付漏洞", "breaking": false}
+rule_ids: ["insufficient-keywords"]
+summary: {"files": 1, "added": 2, "removed": 0}
+evidence: {"semantic_verified": false, "keywords_available": false}
+[exit 1]

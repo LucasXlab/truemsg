@@ -1,0 +1,65 @@
+=== CASE: matching ===
+$ git show --format= --no-ext-diff --no-textconv -U0 HEAD
+diff --git a/src/auth.py b/src/auth.py
+new file mode 100644
+index 0000000..41969e0
+--- /dev/null
++++ b/src/auth.py
+@@ -0,0 +1,2 @@
++def authenticate(token):
++    return bool(token)
+$ truemsg check --json
+[JSON field view; full stdout in showcase-raw.json]
+verdict: "PASS"
+message: {"type": "feat", "subject": "add authenticate token handler", "breaking": false}
+rule_ids: ["consistent"]
+summary: {"files": 1, "added": 2, "removed": 0}
+evidence: {"semantic_verified": false, "keywords_available": true}
+[exit 0]
+=== CASE: mismatch ===
+$ git show --format= --no-ext-diff --no-textconv -U0 HEAD
+diff --git a/tests/test_payments.py b/tests/test_payments.py
+new file mode 100644
+index 0000000..88c6672
+--- /dev/null
++++ b/tests/test_payments.py
+@@ -0,0 +1,2 @@
++def test_payments():
++    assert True
+$ truemsg check --json
+[JSON field view; full stdout in showcase-raw.json]
+verdict: "FAIL"
+message: {"type": "feat", "subject": "add payment gateway", "breaking": false}
+rule_ids: ["trivial-change"]
+summary: {"files": 1, "added": 2, "removed": 0}
+evidence: {"semantic_verified": false, "keywords_available": true}
+[exit 1]
+=== CASE: evidence ===
+$ truemsg check --ref 'HEAD~1' --title 'fix: 修复支付漏洞' --json --fail-on warn
+[JSON field view; full stdout in showcase-raw.json]
+verdict: "WARN"
+message: {"type": "fix", "subject": "修复支付漏洞", "breaking": false}
+rule_ids: ["insufficient-keywords"]
+summary: {"files": 1, "added": 2, "removed": 0}
+evidence: {"semantic_verified": false, "keywords_available": false}
+[exit 1]
+=== CASE: suggest ===
+$ truemsg suggest --ref 'HEAD~1' --json
+[JSON field view; full stdout in showcase-raw.json]
+type: "feat"
+scope: "src"
+subject: "add authenticate"
+conventional: "feat(src): add authenticate"
+requires_review: true
+basis: "changed paths and declarations; suggested type is provisional"
+[exit 0]
+=== CASE: hooks ===
+$ truemsg hook --install
+[truemsg] Existing hook is not owned by truemsg; preserve it and integrate manually
+[exit 2]
+[showcase assertion] existing hook bytes unchanged: true
+=== CASE: git-boundary ===
+$ truemsg check --ref=--output=unexpected.patch --json
+[truemsg] Invalid revision: expected a commit ref, not an option
+[exit 2]
+[showcase assertion] unexpected.patch absent: true

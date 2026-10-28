@@ -1,0 +1,9 @@
+$ truemsg suggest --ref 'HEAD~1' --json
+[JSON field view; full stdout in showcase-raw.json]
+type: "feat"
+scope: "src"
+subject: "add authenticate"
+conventional: "feat(src): add authenticate"
+requires_review: true
+basis: "changed paths and declarations; suggested type is provisional"
+[exit 0]
