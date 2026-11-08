@@ -3,13 +3,6 @@
 <p align="center"><img src="../assets/logo.svg" width="80" height="80" alt="truemsg 标识"></p>
 <h1 align="center">truemsg</h1>
 <p align="center"><strong>找到值得再看一眼的提交宣称。</strong></p>
-<p align="center">
-  <img src="../assets/badge-ci.svg" alt="CI 已准备，未声称远端通过">
-  <img src="../assets/badge-license.svg" alt="MIT 许可">
-  <img src="../assets/badge-version.svg" alt="源码版本 0.2.0，非包注册表发行">
-  <img src="../assets/badge-python.svg" alt="Python 3.11 或以上">
-  <img src="../assets/badge-stars.svg" alt="Star 状态待发布">
-</p>
 
 对照提交 / PR 的文字、改动路径、声明和有限词法信号，提示表达与可见改动可能不一致的地方。无需模型或服务器。
 
@@ -80,6 +73,10 @@ python3 -m venv .venv
 ![真实、确定性的待审消息草稿](../assets/feature-suggest.png)
 
 ### 没有证据时直接说明
+
+空 diff（包括全部被 ignore 过滤的范围）返回 `WARN`、`score: null`、`overlap: 0` 和 `evidence.comparison_available: false`，不再给出 100 分 PASS。warn 阈值下退出 `1`；默认只阻止 FAIL，因此允许 WARN 以 `0` 退出。
+
+发现说明与终端标签默认使用英文；`truemsg check --language zh-CN` 切换中文，也可加 `--json`。JSON 字段名和规则 ID 保持一致。此选项翻译报告，关键词匹配仍只支持 ASCII。
 
 中文或没有受支持关键词的消息不会被 ASCII 重合规则验证。它会得到证据不足的 WARN；`--fail-on warn` 可让这一提醒返回非零。
 

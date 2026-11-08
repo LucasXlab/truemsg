@@ -18,11 +18,27 @@
 
 需要 Python 3.11+ 和 Git 2.31+。安装可能下载依赖，分析离线运行；临时演示会核对预期 PASS / FAIL。
 
+克隆已发布源码，在独立环境中安装：
+
 ```bash
+git clone --branch noah/truemsg https://github.com/LucasXlab/truemsg.git
+cd truemsg
 python3 -m venv .venv
-.venv/bin/python -m pip install .
-.venv/bin/python scripts/demo.py
+. .venv/bin/activate
+python -m pip install .
+python scripts/demo.py
 ```
+
+演示核对两组结果：认证代码与对应消息得到 `PASS`、退出 `0`；只改测试却宣称新增功能得到 `FAIL`、退出 `1`。这是规则结果，仍需人工判断。
+
+接着保持虚拟环境已激活，进入你自己的仓库：
+
+```bash
+cd /absolute/path/to/your/repo
+truemsg check --ref HEAD --language zh-CN
+```
+
+按提示检查所选 diff，再修改消息或说明规则不适用的原因。空比较（包括所有路径均被忽略）输出 `WARN`、`score: null`；加 `--fail-on warn` 时退出 `1`。默认输出语言是英文，`--language zh-CN` 切换发现说明与终端标签。**关键词匹配仍只支持 ASCII**；纯中文提交消息需要人工复核，中文界面不表示中文语义分析。
 
 ## 实际使用
 
@@ -34,7 +50,7 @@ truemsg check --ref HEAD~1 --json
 truemsg check --pr --base main --head feature --title 'feat(auth): add authenticate'
 ```
 
-先激活 `.venv`。第一条检查 HEAD 自身的说明与 diff；range 只作一次聚合比较，不是逐提交审计。`A..B` 比较端点，`A...B` 使用共同祖先。
+第一条检查 HEAD 自身的说明与 diff；range 只作一次聚合比较，不是逐提交审计。`A..B` 比较端点，`A...B` 使用共同祖先。
 
 ### 加入本地策略
 

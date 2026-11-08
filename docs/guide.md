@@ -3,13 +3,6 @@
 <p align="center"><img src="../assets/logo.svg" width="80" height="80" alt="truemsg logo"></p>
 <h1 align="center">truemsg</h1>
 <p align="center"><strong>Find commit claims that deserve a second look.</strong></p>
-<p align="center">
-  <img src="../assets/badge-ci.svg" alt="CI prepared; no remote success claimed">
-  <img src="../assets/badge-license.svg" alt="MIT license">
-  <img src="../assets/badge-version.svg" alt="Source version 0.2.0; not a registry release">
-  <img src="../assets/badge-python.svg" alt="Python 3.11 or later">
-  <img src="../assets/badge-stars.svg" alt="Stars pending">
-</p>
 
 Compare commit or PR wording with changed paths, declarations, and limited lexical signals. Get a review prompt when the claim and observable change appear out of step—without a model or server.
 
@@ -80,6 +73,10 @@ After activating `.venv`, choose a comparison deliberately:
 ![Actual deterministic suggestion that requires review](../assets/feature-suggest.png)
 
 ### Missing evidence stays visible
+
+An empty diff, including a selection entirely removed by ignore rules, yields `WARN`, `score: null`, `overlap: 0` and `evidence.comparison_available: false`. It is not a 100-point PASS. It exits `1` at the warn threshold; the default fail-only threshold permits WARN with exit `0`.
+
+Findings and terminal labels default to English. Use `truemsg check --language zh-CN` for Chinese explanations, also with `--json`. JSON field names and rule IDs remain stable. This translates the report; overlap matching still uses ASCII keywords.
 
 A Chinese/no-keyword message cannot be verified by the ASCII overlap rules. It gets an insufficient-evidence warning rather than a positive semantic claim. `--fail-on warn` makes that warning a nonzero exit.
 

@@ -1,9 +1,9 @@
 {
   "showcase_script_sha256": "f18c513a2e56f8f140591241e8d8501ef1ba7be8e63aaf76112c4264860945c6",
   "renderer_script_sha256": "9ad0d276858173460d1001cb184dbb764943a315812d95c660871a0a421cdceb",
-  "raw_results_sha256": "6e4c44d3416a5d308c3123915aeaf5e5066dc5570c02eca2d9218258bc16fbee",
-  "cast_sha256": "1ebc11950a99bda8c5974b15b0f7ac79f11bc228b95da5480f95594dcfc7772b",
-  "cast_events": 21,
+  "raw_results_sha256": "96fd24c0943f44bbec1ee3ef06376810cb6a2441269004ad39ba03dd700f7d81",
+  "cast_sha256": "c4afb7b199c5c492ad0aef572c5a09deb14ac2875d683efb3d0d04a7f5d17f9e",
+  "cast_events": 16,
   "case_count": 6,
   "source_version": "0.2.0",
   "rendering": "Faithful render of showcase's labelled JSON projection and actual Git output; CRLF -> LF and visual wrapping only. Full unmodified CLI stdout/stderr in showcase-raw.json.",

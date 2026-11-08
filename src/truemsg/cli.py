@@ -71,7 +71,7 @@ def cmd_check(args) -> int:
         cfg = _load_cfg(args)
         msg = msgmod.parse_message(msg_text)
         files = _get_files(selection, is_range)
-        result = analyze.analyze(msg, files, config=cfg)
+        result = analyze.analyze(msg, files, config=cfg, language=getattr(args, "language", "en"))
     except ERRORS as exc:
         print(f"[truemsg] {exc}", file=sys.stderr)
         return 2
@@ -79,7 +79,11 @@ def cmd_check(args) -> int:
         print(report.render_json(result, msg, files))
     else:
         report.render_console(
-            Console(no_color=args.no_color or bool(_env("NO_COLOR"))), result, msg, files
+            Console(no_color=args.no_color or bool(_env("NO_COLOR"))),
+            result,
+            msg,
+            files,
+            language=getattr(args, "language", "en"),
         )
     fail_on = args.fail_on if args.fail_on is not None else cfg["fail_on"]
     return int(result["verdict"] == "FAIL" or (fail_on == "warn" and result["verdict"] == "WARN"))
@@ -167,6 +171,12 @@ def build_parser() -> argparse.ArgumentParser:
     check.add_argument("--body", help="Explicit message/PR body")
     check.add_argument("--config", help="Explicit policy path; errors do not fall back")
     check.add_argument("--json", action="store_true")
+    check.add_argument(
+        "--language",
+        choices=["en", "zh-CN"],
+        default="en",
+        help="Language for findings and terminal labels; keyword matching remains ASCII",
+    )
     check.add_argument(
         "--fail-on", choices=["fail", "warn"], default=None, help="Override policy exit threshold"
     )

@@ -18,11 +18,27 @@ A title says a payment feature was added, but the patch only adds a test file. T
 
 Python 3.11+ and Git 2.31+. Installation may download dependencies; analysis runs offline. The disposable demo checks expected PASS and FAIL cases.
 
+Clone the published source and install it in an isolated environment:
+
 ```bash
+git clone --branch noah/truemsg https://github.com/LucasXlab/truemsg.git
+cd truemsg
 python3 -m venv .venv
-.venv/bin/python -m pip install .
-.venv/bin/python scripts/demo.py
+. .venv/bin/activate
+python -m pip install .
+python scripts/demo.py
 ```
+
+The demo checks one matching auth change and one tests-only feature claim. It expects `PASS`/exit `0` and `FAIL`/exit `1`, respectively; these are rule outcomes, not semantic judgments.
+
+Now open your own repository while keeping the environment active:
+
+```bash
+cd /absolute/path/to/your/repo
+truemsg check --ref HEAD --language en
+```
+
+For each finding, inspect the selected diff and either improve the message or document why the rule does not apply. Empty comparisons, including all-ignored changes, produce `WARN` with `score: null`; `--fail-on warn` makes that exit `1`. English is the default output language; `--language zh-CN` translates findings and terminal labels. **Matching still uses ASCII keywords**, so a Chinese-only message requires manual review.
 
 ## Usage
 
@@ -34,7 +50,7 @@ truemsg check --ref HEAD~1 --json
 truemsg check --pr --base main --head feature --title 'feat(auth): add authenticate'
 ```
 
-Activate `.venv` first. The first command checks HEAD's own message and diff. A selected range is one aggregate comparison, not a per-commit audit. `A..B` uses endpoints; `A...B` uses the merge base.
+The first command checks HEAD's own message and diff. A selected range is one aggregate comparison, not a per-commit audit. `A..B` uses endpoints; `A...B` uses the merge base.
 
 ### Add a local policy
 

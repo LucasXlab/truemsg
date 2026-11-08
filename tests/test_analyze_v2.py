@@ -53,5 +53,6 @@ def test_ignore_paths_via_config():
     cfg = {"thresholds": {}, "ignore": ["generated/*"]}
     msg = parse_message("feat: add generator")
     res = analyze(msg, parse_diff(diff), config=cfg)
-    assert res["verdict"] == "PASS"
+    assert res["verdict"] == "WARN"
     assert res["summary"]["files"] == 0
+    assert res["score"] is None

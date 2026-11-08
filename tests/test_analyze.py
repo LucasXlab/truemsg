@@ -59,7 +59,10 @@ def test_keyword_mismatch_warns():
     assert any(f["rule"] == "keyword-mismatch" for f in res["findings"])
 
 
-def test_empty_diff_passes():
+def test_empty_diff_cannot_claim_consistency():
     msg = parse_message("chore: release")
     res = analyze(msg, [])
-    assert res["verdict"] == "PASS"
+    assert res["verdict"] == "WARN"
+    assert res["score"] is None
+    assert res["summary"]["overlap"] == 0
+    assert res["evidence"]["comparison_available"] is False

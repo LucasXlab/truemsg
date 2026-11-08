@@ -60,7 +60,7 @@ def _overlap(keywords: List[str], toks: set):
     return len(matched) / len(keywords), matched
 
 
-def _categories_present(files: List[Dict]) -> List[str]:
+def _categories_present(files: List[Dict], language: str = "en") -> List[str]:
     cats = set()
     for f in files:
         if f.get("is_test"):
@@ -75,6 +75,16 @@ def _categories_present(files: List[Dict]) -> List[str]:
             cats.add("注释")
         if f.get("binary"):
             cats.add("二进制")
+    if language == "en":
+        names = {
+            "测试": "tests",
+            "文档": "docs",
+            "配置": "configuration",
+            "生成文件": "generated files",
+            "注释": "comments",
+            "二进制": "binary files",
+        }
+        cats = {names[category] for category in cats}
     return sorted(cats)
 
 
@@ -90,7 +100,15 @@ def _logic_line_count(files: List[Dict]) -> int:
     return count
 
 
-def analyze(message: Dict, files: List[Dict], config: Optional[Dict] = None) -> Dict:
+def analyze(
+    message: Dict, files: List[Dict], config: Optional[Dict] = None, language: str = "en"
+) -> Dict:
+    if language not in {"en", "zh-CN"}:
+        raise ValueError("language must be en or zh-CN")
+
+    def t(english, chinese):
+        return chinese if language == "zh-CN" else english
+
     cfg = config or DEFAULTS
     th = cfg.get("thresholds", DEFAULTS["thresholds"])
     ignore = cfg.get("ignore", [])
@@ -115,17 +133,27 @@ def analyze(message: Dict, files: List[Dict], config: Optional[Dict] = None) -> 
     if not files:
         findings.append(
             {
-                "level": "info",
+                "level": "warn",
                 "rule": "empty",
-                "title": "未检测到代码改动",
-                "detail": "该范围没有 diff（可能是空提交、范围选错或被 ignore 过滤）。",
+                "title": t("No changes available to compare", "没有可供比较的改动"),
+                "detail": t(
+                    "The selection is empty or all paths were ignored. Check the range and policy; no consistency evidence was evaluated.",
+                    "所选范围为空，或所有路径均被忽略。请检查范围与策略；本次没有评估一致性证据。",
+                ),
             }
         )
         return {
-            "verdict": "PASS",
-            "score": 100,
+            "verdict": "WARN",
+            "score": None,
             "findings": findings,
-            "summary": {"files": 0, "added": 0, "removed": 0, "real_lines": 0, "overlap": 1.0},
+            "evidence": {
+                "semantic_verified": False,
+                "language": "ASCII keywords",
+                "content_complete": True,
+                "keywords_available": bool(message.get("keywords")),
+                "comparison_available": False,
+            },
+            "summary": {"files": 0, "added": 0, "removed": 0, "real_lines": 0, "overlap": 0.0},
         }
 
     unsupported = [f for f in files if not f.get("content_supported", True)]
@@ -134,8 +162,11 @@ def analyze(message: Dict, files: List[Dict], config: Optional[Dict] = None) -> 
             {
                 "level": "warn",
                 "rule": "insufficient-content",
-                "title": "Content comparison is incomplete",
-                "detail": "Binary, mode, symlink or submodule changes require manual review.",
+                "title": t("Content comparison is incomplete", "内容比较不完整"),
+                "detail": t(
+                    "Binary, mode, symlink or submodule changes require manual review.",
+                    "二进制、文件模式、符号链接或子模块改动需要人工复核。",
+                ),
             }
         )
     if not message.get("keywords"):
@@ -143,21 +174,30 @@ def analyze(message: Dict, files: List[Dict], config: Optional[Dict] = None) -> 
             {
                 "level": "warn",
                 "rule": "insufficient-keywords",
-                "title": "Insufficient lexical evidence",
-                "detail": "No supported ASCII keywords; non-English messages require manual review.",
+                "title": t("Insufficient lexical evidence", "词法证据不足"),
+                "detail": t(
+                    "No supported ASCII keywords; non-English messages require manual review.",
+                    "未找到受支持的 ASCII 关键词；非英文消息需要人工复核。",
+                ),
             }
         )
 
     # R1: limited path/comment-category signal, not proof of behaviour
     if msg_type in {"feat", "fix", "perf"} and trivial:
-        cats = _categories_present(files)
+        cats = _categories_present(files, language)
         level = "fail" if msg_type in {"feat", "perf"} else "warn"
         findings.append(
             {
                 "level": level,
                 "rule": "trivial-change",
-                "title": f"声称「{msg_type}」改动，但仅涉及：{', '.join(cats) or '注释/空白'}",
-                "detail": "仅发现文档、测试、生成路径或注释信号；这不是无行为变化的证明，请人工复核。",
+                "title": t(
+                    f"{msg_type} claim with only: {', '.join(cats) or 'comments/whitespace'}",
+                    f"声称「{msg_type}」改动，但仅涉及：{', '.join(cats) or '注释/空白'}",
+                ),
+                "detail": t(
+                    "Only docs, tests, generated paths or comment signals were found. Review manually; this does not prove behaviour is unchanged.",
+                    "仅发现文档、测试、生成路径或注释信号；这不是无行为变化的证明，请人工复核。",
+                ),
             }
         )
 
@@ -167,8 +207,14 @@ def analyze(message: Dict, files: List[Dict], config: Optional[Dict] = None) -> 
             {
                 "level": "warn",
                 "rule": "docs-with-code",
-                "title": "docs 提交却包含大量实质代码改动",
-                "detail": f"检测到约 {real_lines} 行非文档代码改动，考虑拆分提交。",
+                "title": t(
+                    "docs commit includes substantial code changes",
+                    "docs 提交却包含大量实质代码改动",
+                ),
+                "detail": t(
+                    f"About {real_lines} non-documentation lines changed; consider splitting the commit.",
+                    f"检测到约 {real_lines} 行非文档代码改动，考虑拆分提交。",
+                ),
             }
         )
 
@@ -182,8 +228,13 @@ def analyze(message: Dict, files: List[Dict], config: Optional[Dict] = None) -> 
             {
                 "level": "warn",
                 "rule": "keyword-mismatch",
-                "title": "提交信息关键词与代码改动缺乏对应",
-                "detail": "信息里的关键词在 diff 中几乎找不到对应："
+                "title": t(
+                    "Message keywords have little overlap with the changes",
+                    "提交信息关键词与代码改动缺乏对应",
+                ),
+                "detail": t(
+                    "Unmatched message keywords: ", "信息里的关键词在 diff 中几乎找不到对应："
+                )
                 + (", ".join(missing[:8]) or "（无）"),
             }
         )
@@ -194,8 +245,14 @@ def analyze(message: Dict, files: List[Dict], config: Optional[Dict] = None) -> 
             {
                 "level": "warn",
                 "rule": "breaking-no-deletion",
-                "title": "标记破坏性变更，但未检测到删除/签名变更",
-                "detail": "提交带 ! 或 BREAKING CHANGE，但 diff 里没有删除的标识符或签名变化。",
+                "title": t(
+                    "Breaking marker without a detected identifier deletion",
+                    "标记破坏性变更，但未检测到删除/签名变更",
+                ),
+                "detail": t(
+                    "The message contains ! or BREAKING CHANGE, but no removed identifier or signature was detected. Behaviour can still change without deletion.",
+                    "提交带 ! 或 BREAKING CHANGE，但未检测到删除的标识符或签名变化；没有删除也可能改变行为。",
+                ),
             }
         )
 
@@ -205,8 +262,11 @@ def analyze(message: Dict, files: List[Dict], config: Optional[Dict] = None) -> 
             {
                 "level": "warn",
                 "rule": "vague-large",
-                "title": "改动很大，但提交信息过于含糊",
-                "detail": f"diff 共 {total_added + total_removed} 行，但标题只有 {subject_words} 个词：「{subject}」。",
+                "title": t("Large diff with a short subject", "改动很大，但提交信息过于含糊"),
+                "detail": t(
+                    f"The diff changes {total_added + total_removed} lines; the subject has {subject_words} supported words: {subject}",
+                    f"diff 共 {total_added + total_removed} 行，但标题只有 {subject_words} 个词：「{subject}」。",
+                ),
             }
         )
 
@@ -218,8 +278,14 @@ def analyze(message: Dict, files: List[Dict], config: Optional[Dict] = None) -> 
                 {
                     "level": "warn",
                     "rule": "scope-mismatch",
-                    "title": f"约定范围「{scope}」与改动路径不符",
-                    "detail": "scope 里的关键词没有出现在任何改动文件路径或标识符中。",
+                    "title": t(
+                        f"Scope '{scope}' has no matching path or identifier",
+                        f"约定范围「{scope}」与改动路径不符",
+                    ),
+                    "detail": t(
+                        "Scope keywords were not found in changed paths or identifiers.",
+                        "scope 里的关键词没有出现在任何改动文件路径或标识符中。",
+                    ),
                 }
             )
 
@@ -232,8 +298,13 @@ def analyze(message: Dict, files: List[Dict], config: Optional[Dict] = None) -> 
                 {
                     "level": "warn",
                     "rule": "style-with-logic",
-                    "title": "style 提交却包含逻辑改动",
-                    "detail": f"检测到约 {logic} 行含控制流、{added_idents} 个新标识符，可能应改为 fix/feat/refactor。",
+                    "title": t(
+                        "style commit includes possible logic changes", "style 提交却包含逻辑改动"
+                    ),
+                    "detail": t(
+                        f"Found about {logic} control-flow lines and {added_idents} new identifiers; review the commit type.",
+                        f"检测到约 {logic} 行含控制流、{added_idents} 个新标识符，可能应改为 fix/feat/refactor。",
+                    ),
                 }
             )
 
@@ -246,8 +317,14 @@ def analyze(message: Dict, files: List[Dict], config: Optional[Dict] = None) -> 
                 {
                     "level": "info",
                     "rule": "refactor-without-move",
-                    "title": "refactor 提交没有移动/改名任何标识符",
-                    "detail": "只有内容改动，没有新增或删除的函数/类——看起来更像普通修改而非重构。",
+                    "title": t(
+                        "No identifier additions or removals detected for refactor",
+                        "refactor 提交未检测到新增或删除标识符",
+                    ),
+                    "detail": t(
+                        "Inspect the content changes. Refactoring can preserve names; this signal alone does not establish an incorrect type.",
+                        "请检查内容改动。重构可以保留名称；仅凭此线索不能判断提交类型有误。",
+                    ),
                 }
             )
 
@@ -263,8 +340,14 @@ def analyze(message: Dict, files: List[Dict], config: Optional[Dict] = None) -> 
             {
                 "level": "info",
                 "rule": "consistent",
-                "title": "规则未发现词法冲突（需人工复核）",
-                "detail": f"关键词重合 {ratio:.0%}；不证明语义一致或改动正确。",
+                "title": t(
+                    "No lexical conflict found; human review required",
+                    "规则未发现词法冲突（需人工复核）",
+                ),
+                "detail": t(
+                    f"Keyword overlap {ratio:.0%}; this does not prove semantic consistency or correctness.",
+                    f"关键词重合 {ratio:.0%}；不证明语义一致或改动正确。",
+                ),
             }
         )
 
@@ -282,6 +365,7 @@ def analyze(message: Dict, files: List[Dict], config: Optional[Dict] = None) -> 
             "language": "ASCII keywords",
             "content_complete": not unsupported,
             "keywords_available": bool(message.get("keywords")),
+            "comparison_available": True,
         },
         "summary": {
             "files": len(files),
